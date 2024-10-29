@@ -1,6 +1,9 @@
 {
   "name": "@mccann-hub/create-typescript-template",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "CLI tool to initialize a TypeScript project with dual CommonJS and ESM support, path aliases, unit testing, and linting for NPM publishing.",
   "main": "./dist/cjs/index.js",
   "bin": "./bin/index.js",
