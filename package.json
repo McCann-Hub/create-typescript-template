@@ -1,6 +1,6 @@
 {
   "name": "@mccann-hub/create-typescript-template",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publishConfig": {
     "access": "public"
   },
@@ -61,10 +61,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jabez007/create-typescript-template.git"
+    "url": "git+https://github.com/McCann-Hub/create-typescript-template.git"
   },
   "bugs": {
-    "url": "https://github.com/jabez007/create-typescript-template/issues"
+    "url": "https://github.com/McCann-Hub/create-typescript-template/issues"
   },
-  "homepage": "https://github.com/jabez007/create-typescript-template#readme"
+  "homepage": "https://github.com/McCann-Hub/create-typescript-template#readme"
 }
