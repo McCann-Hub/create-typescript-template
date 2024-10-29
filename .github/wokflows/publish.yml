@@ -1,0 +1,35 @@
+name: Use Shared Action to Publish
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  publish_to_npm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Shared Publish to NPM
+        uses: jabez007/create-typescript-template/.github/shared/npm/publish@master
+        with:
+          node_version: 22.x
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish_to_ghpr:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Shared Publish to NPM
+        uses: jabez007/create-typescript-template/.github/shared/ghpr/publish@master
+        with:
+          node_version: 22.x
+        env:
+          GHPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}

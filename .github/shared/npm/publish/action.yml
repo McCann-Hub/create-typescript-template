@@ -1,0 +1,24 @@
+name: Publish to NPM
+description: ''
+
+inputs:
+  node_version:
+    description: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js ${{ inputs.node_version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node_version }}
+
+    - name: Install dependencies
+      run: npm install
+      shell: bash
+
+    - name: Publish package
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+      shell: bash
