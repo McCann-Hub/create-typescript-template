@@ -21,4 +21,5 @@ runs:
       run: npm publish --registry=https://npm.pkg.github.com
       env:
         NODE_AUTH_TOKEN: ${{ env.GHPR_TOKEN }}
+        NPM_AUTH_TOKEN: ${{ env.GHPR_TOKEN }}
       shell: bash

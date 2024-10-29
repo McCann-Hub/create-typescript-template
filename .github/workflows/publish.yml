@@ -27,7 +27,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Shared Publish to NPM
+      - name: Shared Publish to GHPR
         uses: jabez007/create-typescript-template/.github/shared/ghpr/publish@master
         with:
           node_version: 22.x
