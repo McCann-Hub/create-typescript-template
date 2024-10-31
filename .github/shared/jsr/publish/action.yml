@@ -14,5 +14,5 @@ runs:
         deno-version: ${{ inputs.deno_version }}
 
     - name: Publish package
-      run: deno publish --token ${{ env.JSR_TOKEN }}
+      run: deno publish
       shell: bash
