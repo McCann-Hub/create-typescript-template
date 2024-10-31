@@ -1,18 +1,11 @@
-import assert from 'assert'
-import { hello } from '../src/index'
+import { assertEquals } from 'jsr:@std/assert';
+import { hello } from '../src/index.ts';
 
-describe('Array', function () {
-    describe('#indexOf()', function () {
-        it('should return -1 when the value is not present', function () {
-            assert.equal([1, 2, 3].indexOf(4), -1)
-        })
-    })
-})
+Deno.test('simple test', () => {
+  const x = 1 + 2;
+  assertEquals(x, 3);
+});
 
-describe('Main', function () {
-    describe('#hello', function () {
-        it('should return "hello world!" when no value is passed', function() {
-            assert.equal(hello(), 'Hello world!')
-        })
-    })
-})
+Deno.test('default hello', () => {
+  assertEquals(hello(), 'Hello world!');
+});
