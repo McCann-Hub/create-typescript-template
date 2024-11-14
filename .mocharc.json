@@ -4,7 +4,7 @@
   ],
   "spec": "tests/**/*.spec.ts",
   "require": [
-    "ts-node/register",
+    "tsx",
     "tsconfig-paths/register"
   ],
   "recursive": true

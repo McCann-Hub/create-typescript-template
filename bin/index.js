@@ -295,8 +295,8 @@ async function main() {
   console.log('installing Mocha (this may take a while)');
   await exec('npm install --save-dev mocha @types/mocha');
 
-  console.log('installing ts-node (this may take a while)');
-  await exec('npm install --save-dev ts-node tsconfig-paths');
+  console.log('installing tsx (this may take a while)');
+  await exec('npm install --save-dev tsx tsconfig-paths');
 
   console.log('installing cross-env (this may take a while)');
   await exec('npm install --save-dev cross-env');
@@ -308,7 +308,7 @@ async function main() {
       {
         extension: ['ts'],
         spec: 'tests/**/*.spec.ts',
-        require: ['ts-node/register', 'tsconfig-paths/register'],
+        require: ['tsx', 'tsconfig-paths/register'],
         recursive: true,
       },
       null,
@@ -358,7 +358,7 @@ async function main() {
 
   console.log('adding test script');
   await exec(
-    `npm pkg set scripts.test="cross-env TS_NODE_PROJECT='./tsconfig.test.json' mocha"`
+    `npm pkg set scripts.test="cross-env TSX_TSCONFIG_PATH='./tsconfig.test.json' mocha"`
   );
   /* END */
 
