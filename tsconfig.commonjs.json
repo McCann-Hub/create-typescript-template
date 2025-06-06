@@ -3,11 +3,9 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "Node10",
+    "target": "ES5",
     "outDir": "./dist/cjs",
-    "declarationDir": "./dist/cjs",
-    "target": "ES2015"
-  },
-  "include": [
-    "src/**/*"
-  ]
+    "declaration": false,
+    "declarationMap": false
+  }
 }
