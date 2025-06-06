@@ -222,7 +222,7 @@ async function main() {
   console.log('adding exports in package.json');
   await exec('npm pkg set exports["."].import=./dist/esm/index.js');
   await exec('npm pkg set exports["."].require=./dist/cjs/index.js');
-  await exec('npm pkg set exports["."].types=./dist/types/index.js');
+  await exec('npm pkg set exports["."].types=./dist/types/index.d.ts');
 
   console.log('adding files in package.json');
   await exec('npm pkg set files[0]=dist/**/*');
@@ -250,7 +250,7 @@ async function main() {
   await exec('npm pkg set scripts.prebuild="npm run clean"');
   
   console.log('adding postbuild script');
-  await exec('npm pkg set scripts.prebuild="npm run build:types"');
+  await exec('npm pkg set scripts.postbuild="npm run build:types"');
 /* END */
 
   /*
