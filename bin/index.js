@@ -57,48 +57,20 @@ async function main() {
   );
   configUpdates = [
     {
-      key: 'declaration',
-      value: true,
-    },
-    {
-      key: 'declarationMap',
-      value: true,
-    },
-    {
-      key: 'sourceMap',
-      value: true,
+      key: 'target',
+      value: '"ES2019"',
     },
     {
       key: 'module',
-      value: '"NodeNext"',
-    },
-    {
-      key: 'target',
-      value: '"ES2017"',
-    },
-    {
-      key: 'moduleResolution',
-      value: '"Node16"',
-    },
-    {
-      key: 'esModuleInterop',
-      value: true,
-    },
-    {
-      key: 'skipLibCheck',
-      value: true,
-    },
-    {
-      key: 'resolveJsonModule',
-      value: true,
-    },
-    {
-      key: 'outDir',
-      value: '"./dist"',
+      value: '"Node18"',
     },
     {
       key: 'rootDir',
       value: '"./src"',
+    },
+     {
+      key: 'moduleResolution',
+      value: '"Node16"',
     },
     {
       key: 'baseUrl',
@@ -112,7 +84,31 @@ async function main() {
       }),
     },
     {
+      key: 'rewriteRelativeImportExtensions',
+      value: true,
+    },  
+    {
+      key: 'declaration',
+      value: true,
+    },
+    {
+      key: 'sourceMap',
+      value: true,
+    },
+    {
+      key: 'outDir',
+      value: '"./dist"',
+    },
+    {
       key: 'removeComments',
+      value: false,
+    },
+    {
+      key: 'esModuleInterop',
+      value: true,
+    },
+    {
+      key: 'skipLibCheck',
       value: true,
     },
   ];
@@ -134,7 +130,7 @@ async function main() {
     `},
       "include": ["src/**/*"],
       "exclude": [
-        "node_module",
+        "node_modules",
         "dist",
         "tests"  
       ]    
@@ -151,11 +147,11 @@ async function main() {
         compilerOptions: {
           module: 'CommonJS',
           moduleResolution: 'Node10',
+          target: 'ES5',
           outDir: './dist/cjs',
-          declarationDir: './dist/cjs',
-          target: 'ES2015',
+          declaration: false,
+          declarationMap: false,
         },
-        include: ['src/**/*'],
       },
       null,
       2
@@ -169,11 +165,31 @@ async function main() {
       {
         extends: './tsconfig.json',
         compilerOptions: {
+          module: 'NodeNext',
+          moduleResolution: 'NodeNext',
+          target: 'ES2023',
           outDir: './dist/esm',
-          declarationDir: './dist/esm',
-          target: 'ES2020',
-        },
-        include: ['src/**/*'],
+          declaration: false,
+          declarationMap: false,
+         },
+      },
+      null,
+      2
+    )
+  );
+
+  console.log('writing tsconfig for Types');
+  await write(
+    join(projectWorkingDirectory, 'tsconfig.types.json'),
+    JSON.stringify(
+      {
+        extends: './tsconfig.json',
+        compilerOptions: {
+          outDir: './dist/types',
+          emitDeclarationOnly: true,
+          declaration: true,
+          declarationMap: true,
+         },
       },
       null,
       2
@@ -195,14 +211,18 @@ async function main() {
   await exec('npm pkg set main=./dist/cjs/index.js');
 
   console.log('adding types to package.json');
-  await exec('npm pkg set types=./dist/cjs/index.d.ts');
+  await exec('npm pkg set types=./dist/types/index.d.ts');
 
   console.log('adding module to package.json');
   await exec('npm pkg set module=./dist/esm/index.js');
 
+  console.log('setting type in package.json');
+  await exec('npm pkg set type=module');
+
   console.log('adding exports in package.json');
   await exec('npm pkg set exports["."].import=./dist/esm/index.js');
   await exec('npm pkg set exports["."].require=./dist/cjs/index.js');
+  await exec('npm pkg set exports["."].types=./dist/types/index.d.ts');
 
   console.log('adding files in package.json');
   await exec('npm pkg set files[0]=dist/**/*');
@@ -216,6 +236,7 @@ async function main() {
   await exec(
     'npm pkg set scripts.build="npm run build:cjs && npm run build:esm"'
   );
+  await exec('npm pkg set scripts.build:types="tsc --project tsconfig.types.json"');
 
   console.log('adding prepublishOnly script');
   await exec('npm pkg set scripts.prepublishOnly="npm run build"');
@@ -227,7 +248,10 @@ async function main() {
 
   console.log('adding prebuild script');
   await exec('npm pkg set scripts.prebuild="npm run clean"');
-  /* END */
+  
+  console.log('adding postbuild script');
+  await exec('npm pkg set scripts.postbuild="npm run build:types"');
+/* END */
 
   /*
    * install tsc-alias
@@ -324,7 +348,7 @@ async function main() {
         extends: './tsconfig.json',
         compilerOptions: {
           module: 'CommonJS',
-          target: 'ES2020',
+          target: 'ES2017',
           outDir: './dist/test',
           rootDir: './',
           noEmit: false,
