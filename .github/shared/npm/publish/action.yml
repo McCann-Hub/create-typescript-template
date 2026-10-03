@@ -8,6 +8,13 @@ description: ''
 inputs:
   node_version:
     description: 'Node.js version. Trusted publishing needs 22.14.0 or newer.'
+  staged:
+    description: >-
+      Run `npm stage publish` instead of `npm publish`. The version waits in
+      the stage queue until a maintainer approves it with 2FA on npmjs.com or
+      with `npm stage approve`. Required when the trusted publisher only
+      allows staged publishes.
+    default: 'false'
 
 runs:
   using: composite
@@ -18,9 +25,10 @@ runs:
         node-version: ${{ inputs.node_version }}
         registry-url: 'https://registry.npmjs.org/'
 
-    # Node 22 bundles npm 10, and trusted publishing needs npm 11.5.1 or newer
+    # Node 22 bundles npm 10. Trusted publishing needs npm 11.5.1 or newer,
+    # and `npm stage` needs 11.15.0 or newer.
     - name: Update npm
-      run: npm install -g npm@^11.5.1
+      run: npm install -g npm@^11.15.0
       shell: bash
 
     - name: Install dependencies
@@ -28,7 +36,13 @@ runs:
       shell: bash
 
     - name: Publish package
-      run: npm publish
+      run: |
+        if [ "$STAGED" = "true" ]; then
+          npm stage publish
+        else
+          npm publish
+        fi
       env:
         NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+        STAGED: ${{ inputs.staged }}
       shell: bash
