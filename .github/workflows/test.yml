@@ -12,11 +12,11 @@ jobs:
 
     strategy:
       matrix:
-        node_version: [18.x, 20.x, 22.x]
+        node_version: [20.x, 22.x, 24.x]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - uses: jabez007/create-node-template/.github/shared/node/test@master
         with:
