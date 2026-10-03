@@ -8,6 +8,9 @@ on:
 jobs:
   publish_to_npm:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for npm trusted publishing.
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -17,6 +20,7 @@ jobs:
         with:
           node_version: 22.x
         env:
+          # Only used when trusted publishing isn't set up, e.g. the first publish
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish_to_ghpr:

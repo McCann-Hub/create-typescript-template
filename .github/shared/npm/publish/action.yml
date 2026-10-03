@@ -1,9 +1,20 @@
 name: Publish to NPM
 description: ''
 
+# npm tries trusted publishing (OIDC) first and falls back to NPM_TOKEN.
+# Trusted publishing needs `id-token: write` on the calling job and a
+# trusted publisher set up for the package on npmjs.com.
+
 inputs:
   node_version:
-    description: ''
+    description: 'Node.js version. Trusted publishing needs 22.14.0 or newer.'
+  staged:
+    description: >-
+      Run `npm stage publish` instead of `npm publish`. The version waits in
+      the stage queue until a maintainer approves it with 2FA on npmjs.com or
+      with `npm stage approve`. Required when the trusted publisher only
+      allows staged publishes.
+    default: 'false'
 
 runs:
   using: composite
@@ -14,12 +25,24 @@ runs:
         node-version: ${{ inputs.node_version }}
         registry-url: 'https://registry.npmjs.org/'
 
+    # Node 22 bundles npm 10. Trusted publishing needs npm 11.5.1 or newer,
+    # and `npm stage` needs 11.15.0 or newer.
+    - name: Update npm
+      run: npm install -g npm@^11.15.0
+      shell: bash
+
     - name: Install dependencies
       run: npm install
       shell: bash
 
     - name: Publish package
-      run: npm publish
+      run: |
+        if [ "$STAGED" = "true" ]; then
+          npm stage publish
+        else
+          npm publish
+        fi
       env:
         NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+        STAGED: ${{ inputs.staged }}
       shell: bash
