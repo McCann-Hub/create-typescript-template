@@ -1,9 +1,13 @@
 name: Publish to NPM
 description: ''
 
+# npm tries trusted publishing (OIDC) first and falls back to NPM_TOKEN.
+# Trusted publishing needs `id-token: write` on the calling job and a
+# trusted publisher set up for the package on npmjs.com.
+
 inputs:
   node_version:
-    description: ''
+    description: 'Node.js version. Trusted publishing needs 22.14.0 or newer.'
 
 runs:
   using: composite
@@ -13,6 +17,11 @@ runs:
       with:
         node-version: ${{ inputs.node_version }}
         registry-url: 'https://registry.npmjs.org/'
+
+    # Node 22 bundles npm 10, and trusted publishing needs npm 11.5.1 or newer
+    - name: Update npm
+      run: npm install -g npm@^11.5.1
+      shell: bash
 
     - name: Install dependencies
       run: npm install
