@@ -14,7 +14,7 @@ This tool streamlines the creation of a fully configured TypeScript project, rea
 
 ## Requirements
 
-- **Node.js** (version 14 or later)
+- **Node.js** 20.19+ on the 20 line, or 22.12+ (`^20.19.0 || >=22.12.0`). The generated project installs the current mocha, which requires that range, and its CI tests on Node 20, 22, and 24.
 - **npm** or **yarn**
 
 ## Usage
