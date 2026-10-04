@@ -44,103 +44,44 @@ async function main() {
   /*
    * install TypeScript
    */
+  // typescript-eslint doesn't support TypeScript 6.1 or later yet
   console.log('installing TypeScript (this may take a while)');
-  await exec('npm install --save-dev typescript @types/node');
+  await exec('npm install --save-dev typescript@^5 @types/node');
 
-  console.log('initializing typescript');
-  await exec('npx tsc --init');
-
-  console.log('updating tsconfig');
-  let tsconfig = await read(
+  // Written in full rather than edited from tsc --init, whose output changes
+  // between TypeScript releases
+  console.log('writing tsconfig');
+  await write(
     join(projectWorkingDirectory, 'tsconfig.json'),
-    'utf8'
+    JSON.stringify(
+      {
+        compilerOptions: {
+          target: 'ES2017',
+          module: 'NodeNext',
+          rootDir: './src',
+          moduleResolution: 'Node16',
+          paths: {
+            '@/*': ['./src/*'],
+            '@utils/*': ['./src/utils/*'],
+          },
+          resolveJsonModule: true,
+          declaration: true,
+          declarationMap: true,
+          sourceMap: true,
+          outDir: './dist',
+          removeComments: true,
+          esModuleInterop: true,
+          forceConsistentCasingInFileNames: true,
+          strict: true,
+          skipLibCheck: true,
+        },
+        include: ['src/**/*'],
+        exclude: ['node_modules', 'dist', 'tests'],
+      },
+      null,
+      2
+    )
   );
-  configUpdates = [
-    {
-      key: 'declaration',
-      value: true,
-    },
-    {
-      key: 'declarationMap',
-      value: true,
-    },
-    {
-      key: 'sourceMap',
-      value: true,
-    },
-    {
-      key: 'module',
-      value: '"NodeNext"',
-    },
-    {
-      key: 'target',
-      value: '"ES2017"',
-    },
-    {
-      key: 'moduleResolution',
-      value: '"Node16"',
-    },
-    {
-      key: 'esModuleInterop',
-      value: true,
-    },
-    {
-      key: 'skipLibCheck',
-      value: true,
-    },
-    {
-      key: 'resolveJsonModule',
-      value: true,
-    },
-    {
-      key: 'outDir',
-      value: '"./dist"',
-    },
-    {
-      key: 'rootDir',
-      value: '"./src"',
-    },
-    {
-      key: 'baseUrl',
-      value: '"."',
-    },
-    {
-      key: 'paths',
-      value: JSON.stringify({
-        '@/*': ['src/*'],
-        '@utils/*': ['src/utils/*'],
-      }),
-    },
-    {
-      key: 'removeComments',
-      value: true,
-    },
-  ];
-  const valueReg = '(("[^"]+")|(true|false)|(\\[[^\\]]*\\])|({[^}]*}))';
-  configUpdates.forEach((update) => {
-    const reg = new RegExp(
-      `(\/\/)?\\s*"(${update.key})"\\s*:\\s*${valueReg}(,?\\s*\/\\*)`,
-      'gm'
-    );
-    tsconfig = tsconfig.replace(
-      reg,
-      (match, p1, p2, p3, p4, p5, p6, p7, p8) => {
-        return `${p1 ? '' : '\n    '}"${p2}": ${update.value}${p8 || ''}`;
-      }
-    );
-  });
-  tsconfig = tsconfig.replace(
-    /}\r?\n}/,
-    `},
-      "include": ["src/**/*"],
-      "exclude": [
-        "node_module",
-        "dist",
-        "tests"  
-      ]    
-    }`
-  );
-  await write(join(projectWorkingDirectory, 'tsconfig.json'), tsconfig);
 
   console.log('writing tsconfig for CommonJS');
   await write(
@@ -169,10 +110,16 @@ async function main() {
       {
         extends: './tsconfig.json',
         compilerOptions: {
+          // The package root has no "type", so NodeNext would emit CommonJS here.
+          // ESNext emits import/export, and dist/esm/package.json marks it as ESM.
+          module: 'ESNext',
+          moduleResolution: 'Bundler',
           outDir: './dist/esm',
           declarationDir: './dist/esm',
           target: 'ES2020',
         },
+        // Node's ESM loader needs file extensions on relative imports
+        'tsc-alias': { resolveFullPaths: true },
         include: ['src/**/*'],
       },
       null,
@@ -185,6 +132,17 @@ async function main() {
     await cp(
       join(__dirname, '..', 'src'),
       join(projectWorkingDirectory, 'src'),
+      {
+        recursive: true,
+      }
+    );
+  }
+
+  if (fs.existsSync(join(__dirname, '..', 'scripts'))) {
+    console.log('copying scripts directory');
+    await cp(
+      join(__dirname, '..', 'scripts'),
+      join(projectWorkingDirectory, 'scripts'),
       {
         recursive: true,
       }
@@ -227,6 +185,11 @@ async function main() {
 
   console.log('adding prebuild script');
   await exec('npm pkg set scripts.prebuild="npm run clean"');
+
+  console.log('adding check:package script');
+  await exec(
+    'npm pkg set scripts.check:package="npm run build && node scripts/check-package.mjs"'
+  );
   /* END */
 
   /*
@@ -240,7 +203,7 @@ async function main() {
     'npm pkg set scripts.build:cjs="tsc --project tsconfig.commonjs.json && tsc-alias -p tsconfig.commonjs.json"'
   );
   await exec(
-    'npm pkg set scripts.build:esm="tsc --project tsconfig.esm.json && tsc-alias -p tsconfig.esm.json"'
+    `npm pkg set scripts.build:esm="tsc --project tsconfig.esm.json && tsc-alias -p tsconfig.esm.json && node -e \\"require('fs').writeFileSync('dist/esm/package.json', JSON.stringify({ type: 'module' }))\\""`
   );
   /* END */
 
@@ -324,16 +287,16 @@ async function main() {
         extends: './tsconfig.json',
         compilerOptions: {
           module: 'CommonJS',
+          moduleResolution: 'Node10',
           target: 'ES2020',
           outDir: './dist/test',
           rootDir: './',
           noEmit: false,
           types: ['node', 'mocha'],
           sourceMap: true,
-          baseUrl: '.',
           paths: {
-            '@/*': ['src/*'],
-            '@utils/*': ['src/utils/*'],
+            '@/*': ['./src/*'],
+            '@utils/*': ['./src/utils/*'],
           },
           esModuleInterop: true,
         },

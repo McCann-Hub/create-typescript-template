@@ -1,6 +1,6 @@
 {
   "name": "@mccann-hub/create-typescript-template",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publishConfig": {
     "access": "public"
   },
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "cross-env TSX_TSCONFIG_PATH='./tsconfig.test.json' mocha",
     "build:cjs": "tsc --project tsconfig.commonjs.json && tsc-alias -p tsconfig.commonjs.json",
-    "build:esm": "tsc --project tsconfig.esm.json && tsc-alias -p tsconfig.esm.json",
+    "build:esm": "tsc --project tsconfig.esm.json && tsc-alias -p tsconfig.esm.json && node -e \"require('fs').writeFileSync('dist/esm/package.json', JSON.stringify({ type: 'module' }))\"",
     "build": "npm run build:cjs && npm run build:esm",
     "prepublishOnly": "npm run build",
     "clean": "node -e \"require('fs').rmSync('./dist', { recursive: true, force: true })\"",

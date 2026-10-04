@@ -9,6 +9,7 @@ This tool streamlines the creation of a fully configured TypeScript project, rea
 - **Path Aliases**: Sets up path aliases for easy and organized imports within the project.
 - **ESLint Integration**: Includes ESLint with recommended TypeScript rules for maintaining code quality.
 - **Unit Testing**: Configures Mocha for unit testing.
+- **Package Check**: `npm run check:package` packs the build and checks that `require()`, `import`, and TypeScript under `node16`, `nodenext`, and `bundler` all get the package's real exports. When you change what `src/index.ts` exports, update the checks at the top of `scripts/check-package.mjs`.
 - **Git Integration**: Initializes a Git repository and adds Git information to `package.json`.
 - **NPM Publishing Ready**: Prepares the project for publishing to both npm and GitHub Package Registry.
 
