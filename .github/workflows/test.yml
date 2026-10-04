@@ -21,3 +21,25 @@ jobs:
       - uses: jabez007/create-node-template/.github/shared/node/test@master
         with:
           node_version: ${{ matrix.node_version }}
+
+  check_generated_package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      # Answers "n" to the git question so the generator doesn't wait for input
+      - name: Generate a project
+        working-directory: ${{ runner.temp }}
+        run: echo n | node "$GITHUB_WORKSPACE/bin/index.js" generated-package
+
+      # Packs the generated project's build and loads it with require() and import,
+      # and type-checks it under node16, nodenext, and bundler
+      - name: Check the generated package
+        working-directory: ${{ runner.temp }}/generated-package
+        run: npm run check:package
