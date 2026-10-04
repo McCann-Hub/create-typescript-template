@@ -38,6 +38,10 @@ jobs:
         working-directory: ${{ runner.temp }}
         run: echo n | node "$GITHUB_WORKSPACE/bin/index.js" generated-package
 
+      - name: Type-check the generated project
+        working-directory: ${{ runner.temp }}/generated-package
+        run: npx tsc -p tsconfig.json --noEmit && npx tsc -p tsconfig.test.json --noEmit
+
       # Packs the generated project's build and loads it with require() and import,
       # and type-checks it under node16, nodenext, and bundler
       - name: Check the generated package

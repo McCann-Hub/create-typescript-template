@@ -287,6 +287,7 @@ async function main() {
         extends: './tsconfig.json',
         compilerOptions: {
           module: 'CommonJS',
+          moduleResolution: 'Node10',
           target: 'ES2020',
           outDir: './dist/test',
           rootDir: './',
