@@ -19,6 +19,10 @@ jobs:
         uses: McCann-Hub/create-typescript-template/.github/shared/npm/publish@master
         with:
           node_version: 22.x
+          # Runs npm stage publish, which works with any token and for a first
+          # publish. Approve each release with 2FA on npmjs.com or with
+          # `npm stage approve`.
+          staged: true
         env:
           # Only used when trusted publishing isn't set up, e.g. the first publish
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

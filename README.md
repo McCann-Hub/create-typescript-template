@@ -11,7 +11,7 @@ This tool streamlines the creation of a fully configured TypeScript project, rea
 - **Unit Testing**: Configures Mocha for unit testing.
 - **Package Check**: `npm run check:package` packs the build and checks that `require()`, `import`, and TypeScript under `node16`, `nodenext`, and `bundler` all get the package's real exports. When you change what `src/index.ts` exports, update the checks at the top of `scripts/check-package.mjs`.
 - **Git Integration**: Initializes a Git repository and adds Git information to `package.json`.
-- **NPM Publishing Ready**: Prepares the project for publishing to both npm and GitHub Package Registry.
+- **NPM Publishing Ready**: Pushing a `vX.Y.Z` tag publishes to GitHub Package Registry, and to JSR when the project has a `deno.json`. On npm the workflow stages the release, and it goes live when you approve it with 2FA on npmjs.com or with `npm stage approve`.
 
 ## Requirements
 
